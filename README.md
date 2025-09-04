@@ -16,13 +16,12 @@
 
 ## 주요 기능
 
-- iBeacon 신호 발신 (uuid, Major, Minor 설정)
-- 비콘 수신 및 거리 추정 (Immediate, Near, Far)
+- iBeacon 신호 발신 (uuid, Major, minor 설정)
+- 비콘 수신 및 거리 추정 (immediate, near, far)
 - 실시간 UI 업데이트로 비콘 거리 시각화
 
   
 ## 주석
 
-> 수신기는 **등록된 UUID에 해당하는 비콘 신호만 수신**할 수 있습니다.  
-> iOS에서는 **UUID를 최대 20개까지 등록**할 수 있습니다.  
+> 수신기는 등록된 uuid에 해당하는 비콘 신호만 수신 가능 (beacon uuid 최대 20개 등록 가능)
 > 출처: [Getting Started with iBeacon - Apple](https://developer.apple.com/ibeacon/Getting-Started-with-iBeacon.pdf)
