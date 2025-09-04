@@ -19,17 +19,20 @@ class SendViewController: UIViewController {
     
     private let uuidTF: UITextField = {
         let txf = UITextField()
-        txf.placeholder = "uuid"
-        txf.layer.borderColor = UIColor.systemBlue.cgColor
+        txf.placeholder = "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+        txf.layer.borderColor = UIColor.separator.cgColor
         txf.layer.borderWidth = 1
-        txf.text = "F7A3E806-F5BB-43F8-BA87-0783669EBEB1"
+        txf.borderStyle = .none
+        txf.backgroundColor = .secondarySystemBackground
+        txf.layer.cornerRadius = 10
         txf.font = .systemFont(ofSize: 12)
-        txf.borderStyle = .roundedRect
-        txf.keyboardType = .decimalPad
+        txf.clearButtonMode = .whileEditing
+//        txf.font = .preferredFont(forTextStyle: .body)
+        txf.keyboardType = .asciiCapable
         txf.translatesAutoresizingMaskIntoConstraints = false
         txf.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 0))
         txf.leftViewMode = .always
-        txf.autocapitalizationType = .none
+        txf.autocapitalizationType = .allCharacters
         txf.autocorrectionType = .no
         txf.smartDashesType = .no
         txf.smartQuotesType = .no
@@ -40,10 +43,14 @@ class SendViewController: UIViewController {
     
     private let majorTF: UITextField = {
         let txf = UITextField()
-        txf.placeholder = "major"
-        txf.layer.borderColor = UIColor.systemBlue.cgColor
+        txf.placeholder = "Major (0–65535)"
+        txf.layer.borderColor = UIColor.separator.cgColor
         txf.layer.borderWidth = 1
-        txf.borderStyle = .roundedRect
+        txf.borderStyle = .none
+        txf.backgroundColor = .secondarySystemBackground
+        txf.layer.cornerRadius = 10
+        txf.clearButtonMode = .whileEditing
+        txf.font = .preferredFont(forTextStyle: .body)
         txf.keyboardType = .decimalPad
         txf.translatesAutoresizingMaskIntoConstraints = false
         txf.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 0))
@@ -59,10 +66,14 @@ class SendViewController: UIViewController {
     
     private let minorTF: UITextField = {
         let txf = UITextField()
-        txf.placeholder = "minor"
-        txf.layer.borderColor = UIColor.systemBlue.cgColor
+        txf.placeholder = "Minor (0–65535)"
+        txf.layer.borderColor = UIColor.separator.cgColor
         txf.layer.borderWidth = 1
-        txf.borderStyle = .roundedRect
+        txf.borderStyle = .none
+        txf.backgroundColor = .secondarySystemBackground
+        txf.layer.cornerRadius = 10
+        txf.clearButtonMode = .whileEditing
+        txf.font = .preferredFont(forTextStyle: .body)
         txf.keyboardType = .decimalPad
         txf.translatesAutoresizingMaskIntoConstraints = false
         txf.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 0))
@@ -78,59 +89,244 @@ class SendViewController: UIViewController {
     
     private let btn: UIButton = {
         let btn = UIButton()
-        btn.setTitle("beacon emit", for: .normal)
-        btn.setTitleColor(.systemBlue, for: .normal)
-        btn.tintColor = .systemBlue
+        btn.setTitle("비콘 발신", for: .normal)
+        btn.setTitleColor(.white, for: .normal)
+        btn.backgroundColor = .systemBlue
+        btn.layer.cornerRadius = 12
+        btn.contentEdgeInsets = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
         btn.translatesAutoresizingMaskIntoConstraints = false
         return btn
     }()
+    
+    private let stopBtn: UIButton = {
+        let btn = UIButton()
+        btn.setTitle("발신 중단", for: .normal)
+        btn.setTitleColor(.white, for: .normal)
+        btn.backgroundColor = .systemOrange
+        btn.layer.cornerRadius = 12
+        btn.contentEdgeInsets = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        btn.isEnabled = false
+        btn.alpha = 0.5
+        return btn
+    }()
+
+    private let uuidPickerButton: UIButton = {
+        let b = UIButton(type: .system)
+        b.setImage(UIImage(systemName: "chevron.down.circle"), for: .normal)
+        b.tintColor = .quaternaryLabel
+        b.contentEdgeInsets = UIEdgeInsets(top: 0, left: 6, bottom: 0, right: 16)
+        b.showsMenuAsPrimaryAction = true
+        // menu는 viewDidLoad에서 최초 구성
+        return b
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.addSubview(uuidTF)
         view.addSubview(majorTF)
         view.addSubview(minorTF)
         view.addSubview(btn)
-        view.backgroundColor = .systemBackground
+        view.addSubview(stopBtn)
+        view.backgroundColor = .systemGroupedBackground
         
+        // Build form stacks
+        let uuidGroup = makeFieldGroup(title: "UUID", field: uuidTF)
+        let majorGroup = makeFieldGroup(title: "Major", field: majorTF)
+        let minorGroup = makeFieldGroup(title: "Minor", field: minorTF)
+
+        // Horizontal button row
+        let buttonStack = UIStackView(arrangedSubviews: [btn, stopBtn])
+        buttonStack.axis = .horizontal
+        buttonStack.spacing = 12
+        buttonStack.distribution = .fillEqually
+        buttonStack.alignment = .fill
+
+        // Main vertical content stack
+        let contentStack = UIStackView(arrangedSubviews: [uuidGroup, majorGroup, minorGroup, buttonStack])
+        contentStack.axis = .vertical
+        contentStack.spacing = 16
+        contentStack.alignment = .fill
+        contentStack.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(contentStack)
+
+        NotificationCenter.default.addObserver(self, selector: #selector(reloadUUIDMenu), name: .uuidListDidChange, object: nil)
+
+        // UUID 필드 오른쪽에 드롭다운(심볼) 버튼 설치
+        uuidTF.rightView = uuidPickerButton
+        uuidTF.rightViewMode = .always
+        reloadUUIDMenu()
+
+        // 앱 저장소에서 첫 UUID 자동 채움 (있다면)
+        let registered = UUIDRegistry.load()
+        if (uuidTF.text ?? "").isEmpty, let first = registered.first {
+            uuidTF.text = first
+        }
+
+        // Fixed heights for text fields & buttons
+        uuidTF.heightAnchor.constraint(equalToConstant: 44).isActive = true
+        majorTF.heightAnchor.constraint(equalToConstant: 44).isActive = true
+        minorTF.heightAnchor.constraint(equalToConstant: 44).isActive = true
+        btn.heightAnchor.constraint(equalToConstant: 48).isActive = true
+        stopBtn.heightAnchor.constraint(equalToConstant: 48).isActive = true
+
         NSLayoutConstraint.activate([
-            uuidTF.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            uuidTF.topAnchor.constraint(equalTo: view.topAnchor,constant: 150),
-            uuidTF.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            uuidTF.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            
-            majorTF.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            majorTF.topAnchor.constraint(equalTo: uuidTF.bottomAnchor,constant: 10),
-            majorTF.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            majorTF.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            
-            minorTF.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            minorTF.topAnchor.constraint(equalTo: majorTF.bottomAnchor,constant: 10),
-            minorTF.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            minorTF.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            
-            btn.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            btn.topAnchor.constraint(equalTo: minorTF.bottomAnchor,constant: 10),
-            btn.heightAnchor.constraint(equalToConstant: 50),
-            btn.widthAnchor.constraint(equalToConstant: 120)
+            contentStack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            contentStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            contentStack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 4)
         ])
+        
+        uuidTF.addTarget(self, action: #selector(textFieldsDidChange), for: .editingChanged)
+        majorTF.addTarget(self, action: #selector(textFieldsDidChange), for: .editingChanged)
+        minorTF.addTarget(self, action: #selector(textFieldsDidChange), for: .editingChanged)
+        stopBtn.addTarget(self, action: #selector(stopButtonTapped(_:)), for: .touchUpInside)
+
+        majorTF.inputAccessoryView = makeNumberToolbar()
+        minorTF.inputAccessoryView = makeNumberToolbar()
+
+        // 최초 진입 시 버튼 비활성화
+        //btn.isEnabled = false
+        //btn.alpha = 0.5
+        
         btn.addTarget(self, action: #selector(startButtonTapped(_:)), for: .touchUpInside)
         
+        setButton(btn, enabled: false, enabledColor: .systemBlue)
+        setButton(stopBtn, enabled: false, enabledColor: .systemOrange)
+        
+        self.textFieldsDidChange()
     }
     
     
     override func viewWillDisappear(_ animated: Bool) {
         beaconTransmitter?.stopBeaconSend()
+        beaconTransmitter = nil
+        uuidTF.isEnabled = true
+        majorTF.isEnabled = true
+        minorTF.isEnabled = true
+        btn.setTitle("비콘 발신", for: .normal)
+        setButton(stopBtn, enabled: false, enabledColor: .systemOrange)
+        validateAndUpdateButtons()
     }
     
     @objc func startButtonTapped(_ sender: UIButton) {
-        beaconTransmitter = BeaconTransmitter(uuid: uuidTF.text ?? "F7A3E806-F5BB-43F8-BA87-0783669EBEB1", major: UInt16(majorTF.text ?? "10001") ?? 10001, minor: UInt16(minorTF.text ?? "1001") ?? 1001)
+        let uuidStr = (uuidTF.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        guard UUID(uuidString: uuidStr) != nil else {
+            showAlert(title: "입력 오류", message: "유효한 UUID 형식이 아닙니다.")
+            return
+        }
+        guard let majorVal = UInt16(majorTF.text ?? ""), let minorVal = UInt16(minorTF.text ?? "") else {
+            showAlert(title: "입력 오류", message: "major/minor는 0~65535 범위의 숫자여야 합니다.")
+            return
+        }
+
+        guard let tx = BeaconTransmitter(uuid: uuidStr, major: majorVal, minor: minorVal) else {
+            showAlert(title: "오류", message: "비콘 발신기를 초기화할 수 없습니다.")
+            return
+        }
+        beaconTransmitter = tx
         beaconTransmitter?.requestBluetoothPermission()
         beaconTransmitter?.startBeaconSend()
-        
+
+        uuidTF.isEnabled = false
         majorTF.isEnabled = false
+        minorTF.isEnabled = false
+
         btn.setTitle("발신중", for: .normal)
-        btn.isEnabled = false
-        btn.setTitleColor(.systemGray, for: .normal)
+        setButton(btn, enabled: false, enabledColor: .systemBlue)
+        setButton(stopBtn, enabled: true, enabledColor: .systemOrange)
+    }
+    
+    @objc private func stopButtonTapped(_ sender: UIButton) {
+        beaconTransmitter?.stopBeaconSend()
+        beaconTransmitter = nil
+
+        uuidTF.isEnabled = true
+        majorTF.isEnabled = true
+        minorTF.isEnabled = true
+
+        btn.setTitle("비콘 발신", for: .normal)
+        validateAndUpdateButtons()
+        setButton(stopBtn, enabled: false, enabledColor: .systemOrange)
+    }
+
+    @objc private func textFieldsDidChange() {
+        validateAndUpdateButtons()
+    }
+
+
+    @objc private func reloadUUIDMenu() {
+        uuidPickerButton.menu = makeUUIDMenu()
+        let hasItems = !UUIDRegistry.load().isEmpty
+        uuidPickerButton.isEnabled = hasItems
+        uuidPickerButton.tintColor = hasItems ? .tertiaryLabel : .quaternaryLabel
+    }
+
+    private func makeUUIDMenu() -> UIMenu {
+        let list = UUIDRegistry.load()
+        guard !list.isEmpty else {
+            let empty = UIAction(title: "등록된 UUID 없음", attributes: [.disabled]) { _ in }
+            return UIMenu(title: "UUID 선택", children: [empty])
+        }
+        let actions = list.map { u in
+            UIAction(title: u) { [weak self] _ in
+                self?.uuidTF.text = u
+                self?.textFieldsDidChange()
+            }
+        }
+        return UIMenu(title: "UUID 선택", children: actions)
+    }
+
+    private func validateAndUpdateButtons() {
+        let uuidStr = (uuidTF.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        let validUUID = UUID(uuidString: uuidStr) != nil
+        let validMajor = UInt16(majorTF.text ?? "") != nil
+        let validMinor = UInt16(minorTF.text ?? "") != nil
+        let canStart = validUUID && validMajor && validMinor
+
+        let isSending = beaconTransmitter?.startBeaconSendFlag ?? false
+        //btn.isEnabled = canStart && !isSending
+        //btn.alpha = btn.isEnabled ? 1.0 : 0.5
+        setButton(btn, enabled: canStart && !isSending, enabledColor: .systemBlue)
+    }
+
+    private func makeNumberToolbar() -> UIToolbar {
+        let tb = UIToolbar()
+        tb.sizeToFit()
+        let flex = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+        let done = UIBarButtonItem(title: "Done", style: .done, target: self, action: #selector(doneTappedOnNumberPad))
+        tb.items = [flex, done]
+        return tb
+    }
+
+    @objc private func doneTappedOnNumberPad() {
+        view.endEditing(true)
+    }
+
+    private func showAlert(title: String, message: String) {
+        let a = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        a.addAction(UIAlertAction(title: "확인", style: .default))
+        present(a, animated: true)
+    }
+    
+    private func makeFieldGroup(title: String, field: UITextField) -> UIStackView {
+        let label = UILabel()
+        label.text = title
+        label.font = .preferredFont(forTextStyle: .caption1)
+        label.textColor = .secondaryLabel
+        let stack = UIStackView(arrangedSubviews: [label, field])
+        stack.axis = .vertical
+        stack.spacing = 6
+        stack.alignment = .fill
+        return stack
+    }
+
+    private func setButton(_ button: UIButton, enabled: Bool, enabledColor: UIColor) {
+        button.isEnabled = enabled
+        button.backgroundColor = enabled ? enabledColor : enabledColor.withAlphaComponent(0.3)
+        button.alpha = enabled ? 1.0 : 0.6
+    }
+    deinit {
+        NotificationCenter.default.removeObserver(self, name: .uuidListDidChange, object: nil)
     }
 }
 
@@ -154,8 +350,9 @@ class BeaconTransmitter: NSObject, CBPeripheralManagerDelegate, CBCentralManager
     
     // MARK: - Initializer
     
-    init(uuid: String, major: CLBeaconMajorValue, minor: CLBeaconMinorValue) {
-        self.uuid = UUID(uuidString: uuid)!
+    init?(uuid: String, major: CLBeaconMajorValue, minor: CLBeaconMinorValue) {
+        guard let parsed = UUID(uuidString: uuid.trimmingCharacters(in: .whitespacesAndNewlines)) else { return nil }
+        self.uuid = parsed
         self.major = major
         self.minor = minor
         super.init()

@@ -6,65 +6,82 @@
 //
 
 import UIKit
-import AVFoundation
-import Photos
 import CoreLocation
 import CoreBluetooth
 
 // 수신
 // [CLLocationManagerDelegate 추가 필요]
 class ReceivedViewController: UIViewController , CLLocationManagerDelegate, CBCentralManagerDelegate {
-    func centralManagerDidUpdateState(_ central: CBCentralManager) {
-        switch central.state {
-        case .poweredOn:
-            print("Bluetooth is On.")
-            break
-        case .poweredOff:
-            print("Bluetooth is Off.")
-            break
-        case .resetting:
-            print("Bluetooth is resetting.")
-            break
-        case .unauthorized:
-            print("Bluetooth is unauthorized.")
-            break
-        case .unsupported:
-            print("Bluetooth is unsupported.")
-            break
-        case .unknown:
-            print("Bluetooth is unknown.")
-            break
-        default:
-            break
-        }
-    }
-    
-    private let text: UITextView = {
-        let lbl = UITextView()
-        lbl.font = .systemFont(ofSize: 13)
-        lbl.translatesAutoresizingMaskIntoConstraints = false
-        lbl.textColor = .label
-        lbl.backgroundColor = .systemBackground
-        lbl.text = ""
-        lbl.isUserInteractionEnabled = true
-        return lbl
+    // MARK: - UI (List)
+    private let tableView: UITableView = {
+        let tv = UITableView(frame: .zero, style: .insetGrouped)
+        tv.translatesAutoresizingMaskIntoConstraints = false
+        tv.keyboardDismissMode = .onDrag
+        return tv
     }()
+
+    private let emptyLabel: UILabel = {
+        let lb = UILabel()
+        lb.text = "감지된 비콘이 없습니다."
+        lb.textAlignment = .center
+        lb.textColor = .secondaryLabel
+        lb.numberOfLines = 0
+        lb.translatesAutoresizingMaskIntoConstraints = false
+        lb.isHidden = true
+        return lb
+    }()
+
+    // MARK: - Data model for the list
+    private struct BeaconRow: Hashable {
+        let id: String
+        let uuid: String
+        let major: Int
+        let minor: Int
+        let rssi: Int
+        let proximity: CLProximity
+        let updatedAt: Date
+    }
+
+    private var beaconMap: [String: BeaconRow] = [:]
+    private var beaconItems: [BeaconRow] = []
+#if DEBUG
+    private var isMockMode = false
+#endif
     
     
     
     var bluetoothManager:CBCentralManager!
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
-        view.addSubview(text)
-        text.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive = true
-        text.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16).isActive = true
-        text.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-        text.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        view.backgroundColor = .systemGroupedBackground
+        view.addSubview(tableView)
+        view.addSubview(emptyLabel)
+        tableView.dataSource = self
+        tableView.delegate = self
+        tableView.register(BeaconCell.self, forCellReuseIdentifier: BeaconCell.reuseID)
+        tableView.separatorStyle = .none
+        tableView.rowHeight = 76
+        tableView.estimatedRowHeight = 76
+
+        NSLayoutConstraint.activate([
+            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+
+            emptyLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            emptyLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            emptyLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
+            emptyLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24)
+        ])
         // [위치 권한 설정 퍼미션 확인 실시]
         bluetoothManager = CBCentralManager()
         bluetoothManager.delegate = self
         self.checkLocationPermission()
+        NotificationCenter.default.addObserver(self, selector: #selector(uuidListDidChange(_:)), name: .uuidListDidChange, object: nil)
+#if DEBUG
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "데모", style: .plain, target: self, action: #selector(didTapMockData))
+#endif
     }
     
     
@@ -91,15 +108,13 @@ class ReceivedViewController: UIViewController , CLLocationManagerDelegate, CBCe
         if status == .authorizedAlways {
             // [실시간 비콘 스캔 호출]
             print("authorizedAlways")
-            let time = Timestamp()
-            time.printTimestamp()
+            self.loadRegisteredUUIDs()
             self.startBeaconScanning()
         }
         if status == .authorizedWhenInUse {
             // [실시간 비콘 스캔 호출]
             print("authorizedWhenInUse")
-            let time = Timestamp()
-            time.printTimestamp()
+            self.loadRegisteredUUIDs()
             self.startBeaconScanning()
         }
         if status == .denied {
@@ -122,15 +137,15 @@ class ReceivedViewController: UIViewController , CLLocationManagerDelegate, CBCe
     var startBeaconScanFlag = false // 비콘 스캔 진행 플래그 값
     var beaconScanCount: Float = 0 // 비콘 스캔 진행 카운트 값
     var beaconScanCheck = false // 일치하는 비콘을 찾은 경우 플래그 값
-    
-    // [비콘 설정 셋팅 : 설정한 uuid , major , minor 값을 가지고 실시간 비콘 스캔 진행]
-    let uuid = UUID(uuidString: "F7A3E806-F5BB-43F8-BA87-0783669EBEB1")!
-    //let major = 123 // 필요시 사용
-    //let minor = 456 // 필요시 사용
-    
+
+    // 등록된 UUID 목록을 기반으로 스캔할 대상들
+    private var beaconUUIDs: [UUID] = []
+    private var beaconRegions: [CLBeaconRegion] = []
+    private var beaconConstraints: [CLBeaconIdentityConstraint] = []
+
     // [특정 uuid , major, minor 일치 값 설정]
-    var beaconRegion: CLBeaconRegion!
-    var beaconRegionConstraints: CLBeaconIdentityConstraint!
+    // var beaconRegion: CLBeaconRegion!
+    // var beaconRegionConstraints: CLBeaconIdentityConstraint!
     
     // [특정 비콘을 찾은 경우 저장할 변수]
     var searchUUID : String = ""
@@ -141,38 +156,33 @@ class ReceivedViewController: UIViewController , CLLocationManagerDelegate, CBCe
         // [비콘 스캔 진행 실시]
         if CLLocationManager.isMonitoringAvailable(for: CLBeaconRegion.self) {
             if CLLocationManager.isRangingAvailable() { // 비콘 스캔 기능을 이용할 수 있는 경우
-                
-                // [비콘 스캔이 진행 되지 않은 경우 확인]
                 if self.startBeaconScanFlag == false {
-                    
-                    // [필요시 사용 [1 셋팅] : 특정 uuid , major, minor 일치 값 설정]
-                    //self.beaconRegion = CLBeaconRegion.init(uuid: self.uuid, major: CLBeaconMajorValue(self.major), minor: CLBeaconMinorValue(self.minor), identifier: self.uuid.uuidString)
-                    //self.beaconRegionConstraints = CLBeaconIdentityConstraint(uuid: self.uuid, major: CLBeaconMajorValue(self.major), minor: CLBeaconMinorValue(self.minor))
-                    
-                    
-                    
-                    // [필요시 사용 [2 셋팅] : 특정 uuid 일치 값 설정]
-                    self.beaconRegion = CLBeaconRegion.init(uuid: self.uuid, identifier: self.uuid.uuidString)
-                    self.beaconRegionConstraints = CLBeaconIdentityConstraint(uuid: self.uuid)
-                    
-                    
-                    // [비콘 스캔 시작]
-                    self.locationManager.startMonitoring(for: self.beaconRegion)
-                    self.locationManager.startRangingBeacons(satisfying: self.beaconRegionConstraints)
-                    
-                    
-                    // [비콘 스캔 시작 플래그 값 지정]
+                    // 등록된 UUID 불러오기 (없으면 안내)
+                    if self.beaconUUIDs.isEmpty {
+                        self.showAlert(tittle: "알림", content: "먼저 UUID를 등록해주세요 (최대 \(UUIDRegistry.limit)개).", okBtb: "확인", noBtn: "")
+                        return
+                    }
+
+                    // 최대 20개 region 모니터링 가능 (iOS 한도)
+                    self.beaconRegions.removeAll()
+                    self.beaconConstraints.removeAll()
+
+                    for uuid in self.beaconUUIDs {
+                        let region = CLBeaconRegion(uuid: uuid, identifier: uuid.uuidString)
+                        let constraint = CLBeaconIdentityConstraint(uuid: uuid)
+                        self.beaconRegions.append(region)
+                        self.beaconConstraints.append(constraint)
+
+                        self.locationManager.startMonitoring(for: region)
+                        self.locationManager.startRangingBeacons(satisfying: constraint)
+                    }
+
                     self.startBeaconScanFlag = true
-                    self.startTimer() // 타이머 시작 호출
                 }
-            }
-            else {
-                // [권한 설정 창 이동 실시]
+            } else {
                 self.showAlert(tittle: "알림", content: "비콘스캔 기능 확인이 필요합니다", okBtb: "확인", noBtn: "")
             }
-        }
-        else {
-            // [권한 설정 창 이동 실시]
+        } else {
             self.showAlert(tittle: "알림", content: "비콘스캔 기능 확인이 필요합니다", okBtb: "확인", noBtn: "")
         }
     }
@@ -182,65 +192,59 @@ class ReceivedViewController: UIViewController , CLLocationManagerDelegate, CBCe
     
     // [실시간 비콘 감지 수행 부분]
     func locationManager(_ manager: CLLocationManager, didRangeBeacons beacons: [CLBeacon], in region: CLBeaconRegion) {
-        var textTemp = ""
-        
-        if beacons.count > 0 { // [스캔된 비콘 개수가 있는 경우]
-            for (idx, beacon) in beacons.enumerated() {
-                
-                var proximity = ""
-                switch beacon.proximity {
-                case .far:
-                    proximity = "far"
-                case .immediate:
-                    proximity = "immediate"
-                case .near:
-                    proximity = "near"
-                case .unknown:
-                    proximity = "unknown"
-                @unknown default:
-                    proximity = "unknown"
-                }
-                
-                if beacon.rssi != 0 {
-                    textTemp += "\n\nbeacon\(idx)\nbeacon uuid : \(beacon.uuid)\nbeacon major : \(beacon.major)\nbeacon minor : \(beacon.minor)\nbeacon rssi : \(beacon.rssi)\nbeacon proximity : \(proximity)"
-                }
-                
-            }
+        // 비콘이 하나도 안 잡히는 경우
+        guard !beacons.isEmpty else {
+            beaconMap.removeAll()
+            beaconItems.removeAll()
             DispatchQueue.main.async {
-                self.text.text = textTemp
+                self.tableView.reloadData()
+                self.updateEmptyState(with: "감지된 비콘이 없습니다")
             }
-            for beacon in beacons {
-                print("beacon: \(beacon.major)")
-            }
-            print("")
+            return
         }
-        else {
-            print("감지 끊김")
-            self.text.text = "감지 끊김"
-            for beacon in beacons {
-                DispatchQueue.main.async {
-                    self.text.text = "감지 끊김\n\nbeacon uuid : \(beacon.uuid)\nbeacon major : \(beacon.major)\nbeacon minor : \(beacon.minor)\nbeacon rssi : \(beacon.rssi)"
-                }
-                print("beacon uuid : ", beacon.uuid)
-                print("beacon major : ", beacon.major)
-                print("beacon minor : ", beacon.minor)
-            }
-            
+
+        let now = Date()
+        var newMap: [String: BeaconRow] = [:]
+        for b in beacons where b.rssi != 0 {
+            let key = "\(b.uuid.uuidString)-\(b.major)-\(b.minor)"
+            let row = BeaconRow(
+                id: key,
+                uuid: b.uuid.uuidString,
+                major: b.major.intValue,
+                minor: b.minor.intValue,
+                rssi: b.rssi,
+                proximity: b.proximity,
+                updatedAt: now
+            )
+            newMap[key] = row
         }
-        
-        
+        beaconMap = newMap
+
+        // 정렬: 근접도(즉시/가까움/멀리/미지) → RSSI 내림차순
+        func rank(_ p: CLProximity) -> Int { switch p { case .immediate: return 0; case .near: return 1; case .far: return 2; case .unknown: return 3 } }
+        beaconItems = Array(beaconMap.values).sorted { a, b in
+            if rank(a.proximity) != rank(b.proximity) { return rank(a.proximity) < rank(b.proximity) }
+            return a.rssi > b.rssi
+        }
+
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+            self.updateEmptyState(with: nil)
+        }
     }
     
     
     
     // [실시간 비콘 스캐닝 종료]
     func stopBeaconScanning(){
-        // [실시간 비콘 스캔을 진행한 경우]
         if self.startBeaconScanFlag == true {
-            self.locationManager.stopMonitoring(for: self.beaconRegion)
-            self.locationManager.stopRangingBeacons(satisfying: self.beaconRegionConstraints)
+            for region in self.beaconRegions {
+                self.locationManager.stopMonitoring(for: region)
+            }
+            for constraint in self.beaconConstraints {
+                self.locationManager.stopRangingBeacons(satisfying: constraint)
+            }
             self.startBeaconScanFlag = false // 비콘 스캔 시작 플래그 초기화
-            self.beaconScanCount = 1 // 비콘 스캔 카운트 초기화
             if self.beaconScanCheck == true { // 카운트 동안에 비콘 스캔 일치값 찾음
                 self.beaconScanCheck = false // 비콘 일치값 찾음 플래그 초기화
                 
@@ -253,38 +257,27 @@ class ReceivedViewController: UIViewController , CLLocationManagerDelegate, CBCe
                 self.searchMAJOR = 0
                 self.searchMINOR = 0
             }
-            else { // 카운트 동안에 비콘 스캔 일치값 찾지 못함
-                self.beaconScanCheck = false // 비콘 일치값 찾음 플래그 초기화
-            }
         }
     }
     
     
-    // [실시간 반복 작업 시작 호출]
-    var timer : Timer?
-    func startTimer(){
-        // [타이머 객체 생성 실시]
-        self.timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(self.timerCallback), userInfo: nil, repeats: true)
+    // 등록된 UUID를 UserDefaults에서 읽어옵니다.
+    private func loadRegisteredUUIDs() {
+        let strings = UUIDRegistry.load()
+        self.beaconUUIDs = strings.compactMap { UUID(uuidString: $0) }
     }
-    // [실시간 반복 작업 수행 부분]
-    @objc func timerCallback() {
-        
-        // [처리할 로직 작성 실시]
-        self.beaconScanCount += 1 // 1씩 카운트 값 증가 실시
-        if self.beaconScanCount > 2000 { // 카운트 값이 10인 경우
-            //            self.stopTimer() // 타이머 종료 실시
-        }
+
+    // UUID 목록이 변경되면 스캔을 재시작합니다.
+    @objc private func uuidListDidChange(_ note: Notification) {
+        print("UUID list changed. Restarting beacon scan.")
+        if self.startBeaconScanFlag { self.stopBeaconScanning() }
+        self.loadRegisteredUUIDs()
+        self.startBeaconScanning()
     }
-    // [실시간 반복 작업 정지 호출]
-    func stopTimer(){
-        // [실시간 반복 작업 중지]
-        if self.timer != nil && self.timer!.isValid {
-            self.timer!.invalidate()
-            self.stopBeaconScanning() // 비콘 스캔 종료 호출
-        }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
-    
-    
     
     
     // [애플리케이션 설정창 이동 실시 메소드]
@@ -339,16 +332,229 @@ class ReceivedViewController: UIViewController , CLLocationManagerDelegate, CBCe
         present(alert, animated: false, completion: nil)
     }
     
+    private func updateEmptyState(with message: String?) {
+        let isEmpty = beaconItems.isEmpty
+        emptyLabel.text = message ?? "주변 비콘이 감지되지 않았습니다."
+        emptyLabel.isHidden = !isEmpty
+        tableView.isScrollEnabled = !isEmpty
+    }
+
+#if DEBUG
+    @objc private func didTapMockData() {
+        isMockMode.toggle()
+        if isMockMode {
+            // 데모 모드 시작: 실제 스캔 중지 후 더미 데이터 표시
+            if startBeaconScanFlag { stopBeaconScanning() }
+            loadMockBeacons()
+            navigationItem.rightBarButtonItem?.title = "실시간"
+        } else {
+            // 실시간 모드 복귀
+            beaconMap.removeAll()
+            beaconItems.removeAll()
+            tableView.reloadData()
+            updateEmptyState(with: nil)
+            self.loadRegisteredUUIDs()
+            self.startBeaconScanning()
+            navigationItem.rightBarButtonItem?.title = "데모"
+        }
+    }
+
+    private func loadMockBeacons() {
+        let now = Date()
+        let samples: [BeaconRow] = [
+            BeaconRow(id: "F7A3E806-AAAA-AAAA-AAAA-0783669EBEB1-100-1", uuid: "F7A3E806-F5BB-43F8-BA87-0783669EBEB1", major: 100, minor: 1, rssi: -42, proximity: .immediate, updatedAt: now),
+            BeaconRow(id: "F7A3E806-BBBB-BBBB-BBBB-0783669EBEB1-200-3", uuid: "74278BDA-B644-4520-8F0C-720EAF059935", major: 200, minor: 3, rssi: -58, proximity: .near, updatedAt: now),
+            BeaconRow(id: "F7A3E806-CCCC-CCCC-CCCC-0783669EBEB1-50-9", uuid: "E2C56DB5-DFFB-48D2-B060-D0F5A71096E0", major: 50, minor: 9, rssi: -75, proximity: .far, updatedAt: now),
+            BeaconRow(id: "F7A3E806-DDDD-DDDD-DDDD-0783669EBEB1-10-2", uuid: "00112233-4455-6677-8899-AABBCCDDEEFF", major: 10, minor: 2, rssi: -90, proximity: .unknown, updatedAt: now)
+        ]
+        beaconItems = samples
+        beaconMap = Dictionary(uniqueKeysWithValues: samples.map { ($0.id, $0) })
+        tableView.reloadData()
+        updateEmptyState(with: nil)
+    }
+#endif
+
+    private func proximityString(_ p: CLProximity) -> String {
+        switch p {
+        case .immediate: return "immediate"
+        case .near: return "near"
+        case .far: return "far"
+        case .unknown: return "unknown"
+        @unknown default: return "unknown"
+        }
+    }
+    
+    func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        switch central.state {
+        case .poweredOn:
+            print("Bluetooth is On.")
+            break
+        case .poweredOff:
+            print("Bluetooth is Off.")
+            break
+        case .resetting:
+            print("Bluetooth is resetting.")
+            break
+        case .unauthorized:
+            print("Bluetooth is unauthorized.")
+            break
+        case .unsupported:
+            print("Bluetooth is unsupported.")
+            break
+        case .unknown:
+            print("Bluetooth is unknown.")
+            break
+        default:
+            break
+        }
+    }
 }
 
-class Timestamp {
-    lazy var dateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS "
-        return formatter
+// MARK: - Custom Cell
+final class BeaconCell: UITableViewCell {
+    static let reuseID = "BeaconCell"
+
+    private let container: UIView = {
+        let v = UIView()
+        v.translatesAutoresizingMaskIntoConstraints = false
+        v.backgroundColor = .secondarySystemGroupedBackground
+        v.layer.cornerRadius = 12
+        v.layer.masksToBounds = true
+        return v
     }()
-    
-    func printTimestamp() {
-        print(dateFormatter.string(from: Date()))
+
+    private let titleLabel: UILabel = {
+        let lb = UILabel()
+        lb.translatesAutoresizingMaskIntoConstraints = false
+        lb.font = UIFont.monospacedDigitSystemFont(ofSize: 16, weight: .semibold)
+        lb.textColor = .label
+        lb.numberOfLines = 1
+        return lb
+    }()
+
+    private let subtitleLabel: UILabel = {
+        let lb = UILabel()
+        lb.translatesAutoresizingMaskIntoConstraints = false
+        lb.font = .preferredFont(forTextStyle: .footnote)
+        lb.textColor = .secondaryLabel
+        lb.numberOfLines = 1
+        return lb
+    }()
+
+    private let rssiLabel: InsetLabel = {
+        let lb = InsetLabel()
+        lb.numberOfLines = 0
+        lb.textAlignment = .right
+        lb.translatesAutoresizingMaskIntoConstraints = false
+        lb.font = UIFont.monospacedDigitSystemFont(ofSize: 13, weight: .medium)
+        lb.textColor = .secondaryLabel
+        lb.insets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+        lb.backgroundColor = .clear
+        lb.setContentHuggingPriority(.required, for: .horizontal)
+        return lb
+    }()
+
+    private let stack: UIStackView = {
+        let st = UIStackView()
+        st.translatesAutoresizingMaskIntoConstraints = false
+        st.axis = .vertical
+        st.spacing = 4
+        st.alignment = .fill
+        st.backgroundColor = .clear
+        return st
+    }()
+
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        backgroundColor = .clear
+        contentView.backgroundColor = .clear
+        selectionStyle = .default
+
+        contentView.addSubview(container)
+        container.addSubview(stack)
+        container.addSubview(rssiLabel)
+        stack.addArrangedSubview(titleLabel)
+        stack.addArrangedSubview(subtitleLabel)
+
+        NSLayoutConstraint.activate([
+            container.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
+            container.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
+            container.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 6),
+            container.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -6),
+
+            stack.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 12),
+            stack.centerYAnchor.constraint(equalTo: container.centerYAnchor),
+            stack.trailingAnchor.constraint(equalTo: rssiLabel.leadingAnchor, constant: -12),
+
+            rssiLabel.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -12),
+            rssiLabel.centerYAnchor.constraint(equalTo: container.centerYAnchor)
+        ])
+    }
+
+    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+
+    func configure(uuid: String, major: Int, minor: Int, rssi: Int, proximity: CLProximity) {
+        titleLabel.text = "\(major)  /  \(minor)"
+        subtitleLabel.text = "\(uuid)"
+        rssiLabel.text = "\(rssi) dBm\n\(proximityString(proximity))"
+    }
+
+    private func proximityString(_ p: CLProximity) -> String {
+        switch p {
+        case .immediate: return "immediate"
+        case .near: return "near"
+        case .far: return "far"
+        case .unknown: return "unknown"
+        @unknown default: return "unknown"
+        }
+    }
+
+
+    // Small padding label for RSSI capsule
+    private class InsetLabel: UILabel {
+        var insets: UIEdgeInsets = .zero
+        override func drawText(in rect: CGRect) {
+            super.drawText(in: rect.inset(by: insets))
+        }
+        override var intrinsicContentSize: CGSize {
+            let size = super.intrinsicContentSize
+            return CGSize(width: size.width + insets.left + insets.right,
+                          height: size.height + insets.top + insets.bottom)
+        }
+    }
+}
+
+
+
+extension ReceivedViewController: UITableViewDataSource, UITableViewDelegate {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return beaconItems.count
+    }
+
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let row = beaconItems[indexPath.row]
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: BeaconCell.reuseID, for: indexPath) as? BeaconCell else {
+            return UITableViewCell()
+        }
+        cell.configure(uuid: row.uuid, major: row.major, minor: row.minor, rssi: row.rssi, proximity: row.proximity)
+        return cell
+    }
+
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        let row = beaconItems[indexPath.row]
+        let detail = BeaconDetailViewController(
+            uuid: row.uuid,
+            major: row.major,
+            minor: row.minor,
+            rssi: row.rssi,
+            proximity: row.proximity
+        )
+        if let sheet = detail.sheetPresentationController {
+            sheet.detents = [.medium(), .large()]
+            sheet.prefersGrabberVisible = true
+            sheet.preferredCornerRadius = 16
+        }
+        present(detail, animated: true)
     }
 }

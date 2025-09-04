@@ -18,6 +18,8 @@
 		E94DB6202A807BD600876F52 /* BeaconAPITest080701Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E94DB61F2A807BD600876F52 /* BeaconAPITest080701Tests.swift */; };
 		E94DB62A2A807BD600876F52 /* BeaconAPITest080701UITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E94DB6292A807BD600876F52 /* BeaconAPITest080701UITests.swift */; };
 		E94DB62C2A807BD600876F52 /* BeaconAPITest080701UITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E94DB62B2A807BD600876F52 /* BeaconAPITest080701UITestsLaunchTests.swift */; };
+		E9B654192E695DCF00115169 /* RegistUUIDViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B654182E695DCF00115169 /* RegistUUIDViewController.swift */; };
+		E9B6541B2E69E73200115169 /* BeaconDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B6541A2E69E73200115169 /* BeaconDetailViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,6 +55,8 @@
 		E94DB6252A807BD600876F52 /* BeaconAPITest080701UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BeaconAPITest080701UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E94DB6292A807BD600876F52 /* BeaconAPITest080701UITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeaconAPITest080701UITests.swift; sourceTree = "<group>"; };
 		E94DB62B2A807BD600876F52 /* BeaconAPITest080701UITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeaconAPITest080701UITestsLaunchTests.swift; sourceTree = "<group>"; };
+		E9B654182E695DCF00115169 /* RegistUUIDViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistUUIDViewController.swift; sourceTree = "<group>"; };
+		E9B6541A2E69E73200115169 /* BeaconDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeaconDetailViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -107,6 +111,8 @@
 				E94DB60A2A807BD400876F52 /* SceneDelegate.swift */,
 				E94DB60C2A807BD400876F52 /* SendViewController.swift */,
 				E921221D2A837E9C00954098 /* ReceivedViewController.swift */,
+				E9B654182E695DCF00115169 /* RegistUUIDViewController.swift */,
+				E9B6541A2E69E73200115169 /* BeaconDetailViewController.swift */,
 				E94DB60E2A807BD400876F52 /* Main.storyboard */,
 				E94DB6112A807BD600876F52 /* Assets.xcassets */,
 				E94DB6132A807BD600876F52 /* LaunchScreen.storyboard */,
@@ -265,8 +271,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				E91A0C4B2DF94B750082F226 /* ViewController.swift in Sources */,
+				E9B654192E695DCF00115169 /* RegistUUIDViewController.swift in Sources */,
 				E94DB60D2A807BD400876F52 /* SendViewController.swift in Sources */,
 				E921221E2A837E9C00954098 /* ReceivedViewController.swift in Sources */,
+				E9B6541B2E69E73200115169 /* BeaconDetailViewController.swift in Sources */,
 				E94DB6092A807BD400876F52 /* AppDelegate.swift in Sources */,
 				E94DB60B2A807BD400876F52 /* SceneDelegate.swift in Sources */,
 			);
