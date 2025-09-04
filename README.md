@@ -16,7 +16,7 @@
 
 ## 주요 기능
 
-- iBeacon 신호 발신 (UUID, Major, Minor 설정)
+- iBeacon 신호 발신 (Major, Minor 설정)
 - 비콘 수신 및 거리 추정 (Immediate, Near, Far)
 - 실시간 UI 업데이트로 비콘 거리 시각화
 
