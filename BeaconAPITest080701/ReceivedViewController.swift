@@ -13,7 +13,7 @@ import CoreBluetooth
 
 // 수신
 // [CLLocationManagerDelegate 추가 필요]
-class ViewController: UIViewController , CLLocationManagerDelegate, CBCentralManagerDelegate {
+class ReceivedViewController: UIViewController , CLLocationManagerDelegate, CBCentralManagerDelegate {
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
         switch central.state {
         case .poweredOn:
@@ -43,8 +43,8 @@ class ViewController: UIViewController , CLLocationManagerDelegate, CBCentralMan
         let lbl = UITextView()
         lbl.font = .systemFont(ofSize: 13)
         lbl.translatesAutoresizingMaskIntoConstraints = false
-        lbl.textColor = .black
-        lbl.backgroundColor = .white
+        lbl.textColor = .label
+        lbl.backgroundColor = .systemBackground
         lbl.text = ""
         lbl.isUserInteractionEnabled = true
         return lbl
@@ -55,7 +55,7 @@ class ViewController: UIViewController , CLLocationManagerDelegate, CBCentralMan
     var bluetoothManager:CBCentralManager!
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
         view.addSubview(text)
         text.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive = true
         text.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16).isActive = true
@@ -183,11 +183,8 @@ class ViewController: UIViewController , CLLocationManagerDelegate, CBCentralMan
     // [실시간 비콘 감지 수행 부분]
     func locationManager(_ manager: CLLocationManager, didRangeBeacons beacons: [CLBeacon], in region: CLBeaconRegion) {
         var textTemp = ""
-        let time = Timestamp()
-        time.printTimestamp()
         
         if beacons.count > 0 { // [스캔된 비콘 개수가 있는 경우]
-            print("감지됨")
             for (idx, beacon) in beacons.enumerated() {
                 
                 var proximity = ""
@@ -212,6 +209,10 @@ class ViewController: UIViewController , CLLocationManagerDelegate, CBCentralMan
             DispatchQueue.main.async {
                 self.text.text = textTemp
             }
+            for beacon in beacons {
+                print("beacon: \(beacon.major)")
+            }
+            print("")
         }
         else {
             print("감지 끊김")
@@ -224,6 +225,7 @@ class ViewController: UIViewController , CLLocationManagerDelegate, CBCentralMan
                 print("beacon major : ", beacon.major)
                 print("beacon minor : ", beacon.minor)
             }
+            
         }
         
         

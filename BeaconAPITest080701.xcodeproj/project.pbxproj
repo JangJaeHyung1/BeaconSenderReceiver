@@ -7,9 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E91A0C4B2DF94B750082F226 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91A0C4A2DF94B750082F226 /* ViewController.swift */; };
+		E921221E2A837E9C00954098 /* ReceivedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E921221D2A837E9C00954098 /* ReceivedViewController.swift */; };
 		E94DB6092A807BD400876F52 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E94DB6082A807BD400876F52 /* AppDelegate.swift */; };
 		E94DB60B2A807BD400876F52 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E94DB60A2A807BD400876F52 /* SceneDelegate.swift */; };
-		E94DB60D2A807BD400876F52 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E94DB60C2A807BD400876F52 /* ViewController.swift */; };
+		E94DB60D2A807BD400876F52 /* SendViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E94DB60C2A807BD400876F52 /* SendViewController.swift */; };
 		E94DB6102A807BD400876F52 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E94DB60E2A807BD400876F52 /* Main.storyboard */; };
 		E94DB6122A807BD600876F52 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E94DB6112A807BD600876F52 /* Assets.xcassets */; };
 		E94DB6152A807BD600876F52 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E94DB6132A807BD600876F52 /* LaunchScreen.storyboard */; };
@@ -36,10 +38,12 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		E91A0C4A2DF94B750082F226 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		E921221D2A837E9C00954098 /* ReceivedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceivedViewController.swift; sourceTree = "<group>"; };
 		E94DB6052A807BD400876F52 /* BeaconAPITest080701.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BeaconAPITest080701.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E94DB6082A807BD400876F52 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E94DB60A2A807BD400876F52 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		E94DB60C2A807BD400876F52 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		E94DB60C2A807BD400876F52 /* SendViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendViewController.swift; sourceTree = "<group>"; };
 		E94DB60F2A807BD400876F52 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		E94DB6112A807BD600876F52 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E94DB6142A807BD600876F52 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -101,11 +105,13 @@
 			children = (
 				E94DB6082A807BD400876F52 /* AppDelegate.swift */,
 				E94DB60A2A807BD400876F52 /* SceneDelegate.swift */,
-				E94DB60C2A807BD400876F52 /* ViewController.swift */,
+				E94DB60C2A807BD400876F52 /* SendViewController.swift */,
+				E921221D2A837E9C00954098 /* ReceivedViewController.swift */,
 				E94DB60E2A807BD400876F52 /* Main.storyboard */,
 				E94DB6112A807BD600876F52 /* Assets.xcassets */,
 				E94DB6132A807BD600876F52 /* LaunchScreen.storyboard */,
 				E94DB6162A807BD600876F52 /* Info.plist */,
+				E91A0C4A2DF94B750082F226 /* ViewController.swift */,
 			);
 			path = BeaconAPITest080701;
 			sourceTree = "<group>";
@@ -258,7 +264,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E94DB60D2A807BD400876F52 /* ViewController.swift in Sources */,
+				E91A0C4B2DF94B750082F226 /* ViewController.swift in Sources */,
+				E94DB60D2A807BD400876F52 /* SendViewController.swift in Sources */,
+				E921221E2A837E9C00954098 /* ReceivedViewController.swift in Sources */,
 				E94DB6092A807BD400876F52 /* AppDelegate.swift in Sources */,
 				E94DB60B2A807BD400876F52 /* SceneDelegate.swift in Sources */,
 			);
@@ -366,7 +374,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -420,7 +428,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -440,11 +448,16 @@
 				DEVELOPMENT_TEAM = 8Y6GZNH939;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = BeaconAPITest080701/Info.plist;
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "블루투스 사용권한 요청";
+				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "블루투스 주변기기 사용권한 요청";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "위치권한 3";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "위치권한1";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -468,11 +481,16 @@
 				DEVELOPMENT_TEAM = 8Y6GZNH939;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = BeaconAPITest080701/Info.plist;
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "블루투스 사용권한 요청";
+				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "블루투스 주변기기 사용권한 요청";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "위치권한 3";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "위치권한1";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

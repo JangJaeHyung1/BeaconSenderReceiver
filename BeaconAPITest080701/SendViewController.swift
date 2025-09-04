@@ -13,16 +13,36 @@ import CoreLocation
 import CoreBluetooth
 // 발신
 
-class ViewController2: UIViewController {
+class SendViewController: UIViewController {
     
     private var beaconTransmitter: BeaconTransmitter?
     
-    private let major: UITextField = {
+    private let majorTF: UITextField = {
         let txf = UITextField()
         txf.placeholder = "major"
-        txf.borderStyle = .line
-        txf.backgroundColor = .white
-        txf.textColor = .black
+        txf.layer.borderColor = UIColor.systemBlue.cgColor
+        txf.layer.borderWidth = 1
+        txf.borderStyle = .roundedRect
+        txf.keyboardType = .decimalPad
+        txf.translatesAutoresizingMaskIntoConstraints = false
+        txf.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 0))
+        txf.leftViewMode = .always
+        txf.autocapitalizationType = .none
+        txf.autocorrectionType = .no
+        txf.smartDashesType = .no
+        txf.smartQuotesType = .no
+        txf.smartInsertDeleteType = .no
+        txf.spellCheckingType = .no
+        return txf
+    }()
+    
+    private let minorTF: UITextField = {
+        let txf = UITextField()
+        txf.placeholder = "minor"
+        txf.layer.borderColor = UIColor.systemBlue.cgColor
+        txf.layer.borderWidth = 1
+        txf.borderStyle = .roundedRect
+        txf.keyboardType = .decimalPad
         txf.translatesAutoresizingMaskIntoConstraints = false
         txf.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 0))
         txf.leftViewMode = .always
@@ -37,26 +57,53 @@ class ViewController2: UIViewController {
     
     private let btn: UIButton = {
         let btn = UIButton()
-        btn.setTitle("start", for: .normal)
+        btn.setTitle("beacon emit", for: .normal)
+        btn.setTitleColor(.systemBlue, for: .normal)
         btn.tintColor = .systemBlue
         btn.translatesAutoresizingMaskIntoConstraints = false
         return btn
     }()
     override func viewDidLoad() {
         super.viewDidLoad()
-        beaconTransmitter = BeaconTransmitter(uuid: "F7A3E806-F5BB-43F8-BA87-0783669EBEB1", major: 10164, minor: 1001)
+        view.addSubview(majorTF)
+        view.addSubview(minorTF)
+        view.addSubview(btn)
+        view.backgroundColor = .systemBackground
+        
+        NSLayoutConstraint.activate([
+            majorTF.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            majorTF.topAnchor.constraint(equalTo: view.topAnchor,constant: 200),
+            majorTF.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            majorTF.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            
+            minorTF.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            minorTF.topAnchor.constraint(equalTo: majorTF.bottomAnchor,constant: 10),
+            minorTF.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            minorTF.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            
+            btn.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            btn.topAnchor.constraint(equalTo: minorTF.bottomAnchor,constant: 10),
+            btn.heightAnchor.constraint(equalToConstant: 50),
+            btn.widthAnchor.constraint(equalToConstant: 120)
+        ])
+        btn.addTarget(self, action: #selector(startButtonTapped(_:)), for: .touchUpInside)
+        
+    }
+    
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        beaconTransmitter?.stopBeaconSend()
+    }
+    
+    @objc func startButtonTapped(_ sender: UIButton) {
+        beaconTransmitter = BeaconTransmitter(uuid: "F7A3E806-F5BB-43F8-BA87-0783669EBEB1", major: UInt16(majorTF.text ?? "10001") ?? 10001, minor: UInt16(minorTF.text ?? "1001") ?? 1001)
         beaconTransmitter?.requestBluetoothPermission()
         beaconTransmitter?.startBeaconSend()
-    }
-    
-    
-    
-    @IBAction func startButtonTapped(_ sender: UIButton) {
-        beaconTransmitter?.startBeaconSend()
-    }
-    
-    @IBAction func stopButtonTapped(_ sender: UIButton) {
-        beaconTransmitter?.stopBeaconSend()
+        
+        majorTF.isEnabled = false
+        btn.setTitle("발신중", for: .normal)
+        btn.isEnabled = false
+        btn.setTitleColor(.systemGray, for: .normal)
     }
 }
 
