@@ -21,3 +21,8 @@
 - 실시간 UI 업데이트로 비콘 거리 시각화
 
   
+## 주석
+
+> 수신기는 **등록된 UUID에 해당하는 비콘 신호만 수신**할 수 있습니다.  
+> iOS에서는 **UUID를 최대 20개까지 등록**할 수 있습니다.  
+> 출처: [Getting Started with iBeacon - Apple](https://developer.apple.com/ibeacon/Getting-Started-with-iBeacon.pdf)
