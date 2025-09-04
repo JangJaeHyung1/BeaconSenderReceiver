@@ -17,6 +17,27 @@ class SendViewController: UIViewController {
     
     private var beaconTransmitter: BeaconTransmitter?
     
+    private let uuidTF: UITextField = {
+        let txf = UITextField()
+        txf.placeholder = "uuid"
+        txf.layer.borderColor = UIColor.systemBlue.cgColor
+        txf.layer.borderWidth = 1
+        txf.text = "F7A3E806-F5BB-43F8-BA87-0783669EBEB1"
+        txf.font = .systemFont(ofSize: 12)
+        txf.borderStyle = .roundedRect
+        txf.keyboardType = .decimalPad
+        txf.translatesAutoresizingMaskIntoConstraints = false
+        txf.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 0))
+        txf.leftViewMode = .always
+        txf.autocapitalizationType = .none
+        txf.autocorrectionType = .no
+        txf.smartDashesType = .no
+        txf.smartQuotesType = .no
+        txf.smartInsertDeleteType = .no
+        txf.spellCheckingType = .no
+        return txf
+    }()
+    
     private let majorTF: UITextField = {
         let txf = UITextField()
         txf.placeholder = "major"
@@ -65,14 +86,20 @@ class SendViewController: UIViewController {
     }()
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.addSubview(uuidTF)
         view.addSubview(majorTF)
         view.addSubview(minorTF)
         view.addSubview(btn)
         view.backgroundColor = .systemBackground
         
         NSLayoutConstraint.activate([
+            uuidTF.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            uuidTF.topAnchor.constraint(equalTo: view.topAnchor,constant: 150),
+            uuidTF.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            uuidTF.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            
             majorTF.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            majorTF.topAnchor.constraint(equalTo: view.topAnchor,constant: 200),
+            majorTF.topAnchor.constraint(equalTo: uuidTF.bottomAnchor,constant: 10),
             majorTF.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             majorTF.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             
@@ -96,7 +123,7 @@ class SendViewController: UIViewController {
     }
     
     @objc func startButtonTapped(_ sender: UIButton) {
-        beaconTransmitter = BeaconTransmitter(uuid: "F7A3E806-F5BB-43F8-BA87-0783669EBEB1", major: UInt16(majorTF.text ?? "10001") ?? 10001, minor: UInt16(minorTF.text ?? "1001") ?? 1001)
+        beaconTransmitter = BeaconTransmitter(uuid: uuidTF.text ?? "F7A3E806-F5BB-43F8-BA87-0783669EBEB1", major: UInt16(majorTF.text ?? "10001") ?? 10001, minor: UInt16(minorTF.text ?? "1001") ?? 1001)
         beaconTransmitter?.requestBluetoothPermission()
         beaconTransmitter?.startBeaconSend()
         
