@@ -12,7 +12,7 @@ class ViewController: UIViewController {
     // MARK: - UI
     private let titleLabel: UILabel = {
         let lb = UILabel()
-        lb.text = "Beacon Demo"
+        lb.text = "landing_title".localized
         lb.font = .preferredFont(forTextStyle: .largeTitle)
         lb.textColor = .label
         lb.adjustsFontForContentSizeCategory = true
@@ -22,7 +22,7 @@ class ViewController: UIViewController {
 
     private let subtitleLabel: UILabel = {
         let lb = UILabel()
-        lb.text = "Beacon 기능을 선택하세요"
+        lb.text = "landing_subtitle".localized
         lb.font = .preferredFont(forTextStyle: .body)
         lb.textColor = .label
         lb.numberOfLines = 0
@@ -38,28 +38,28 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemGroupedBackground
-        navigationItem.title = "Beacon SendReceiver"
+        navigationItem.title = "app_name".localized
         navigationController?.navigationBar.prefersLargeTitles = true
 
         // Configure buttons
         configureActionButton(
             txButton,
-            title: "비콘 발신기로 등록",
-            subtitle: "기기에서 iBeacon 신호 발신",
+            title: "tx_title".localized,
+            subtitle: "tx_subtitle".localized,
             symbol: "dot.radiowaves.right",
             color: .systemBlue
         )
         configureActionButton(
             rxButton,
-            title: "비콘 신호 수신하기",
-            subtitle: "주변 iBeacon 탐지",
+            title: "rx_title".localized,
+            subtitle: "rx_subtitle".localized,
             symbol: "antenna.radiowaves.left.and.right",
             color: .systemGreen
         )
         configureActionButton(
             regButton,
-            title: "Beacon UUID 등록하기",
-            subtitle: "탐지 대상 UUID 관리",
+            title: "reg_title".localized,
+            subtitle: "reg_subtitle".localized,
             symbol: "list.bullet.rectangle",
             color: .systemOrange
         )
@@ -213,5 +213,34 @@ class ViewController: UIViewController {
         UIView.animate(withDuration: 0.15, delay: 0, usingSpringWithDamping: 0.9, initialSpringVelocity: 0.5, options: [.allowUserInteraction]) {
             sender.transform = .identity
         }
+    }
+}
+
+
+extension String {
+    
+    func localizedFormat(_ arguments: CVarArg...) -> String {
+        let localizedValue = self.localized
+        return String(format: localizedValue, arguments: arguments)
+    }
+    
+    var localized: String {
+        if let bundle = Bundle.localizedBundle {
+            return bundle.localizedString(forKey: self, value: self, table: "Localizable")
+        } else {
+            return NSLocalizedString(self, tableName: "Localizable", value: self, comment: "")
+        }
+    }
+}
+
+private var localizedBundleKey: UInt8 = 0
+
+extension Bundle {
+    static func setLanguageBundle(_ bundle: Bundle) {
+        objc_setAssociatedObject(Bundle.main, &localizedBundleKey, bundle, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+    }
+
+    static var localizedBundle: Bundle? {
+        objc_getAssociatedObject(Bundle.main, &localizedBundleKey) as? Bundle
     }
 }

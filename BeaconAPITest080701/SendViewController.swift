@@ -19,7 +19,7 @@ class SendViewController: UIViewController {
     
     private let uuidTF: UITextField = {
         let txf = UITextField()
-        txf.placeholder = "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+        txf.placeholder = "uuid_placeholder".localized
         txf.layer.borderColor = UIColor.separator.cgColor
         txf.layer.borderWidth = 1
         txf.borderStyle = .none
@@ -43,7 +43,7 @@ class SendViewController: UIViewController {
     
     private let majorTF: UITextField = {
         let txf = UITextField()
-        txf.placeholder = "Major (0–65535)"
+        txf.placeholder = "major_placeholder".localized
         txf.layer.borderColor = UIColor.separator.cgColor
         txf.layer.borderWidth = 1
         txf.borderStyle = .none
@@ -66,7 +66,7 @@ class SendViewController: UIViewController {
     
     private let minorTF: UITextField = {
         let txf = UITextField()
-        txf.placeholder = "Minor (0–65535)"
+        txf.placeholder = "minor_placeholder".localized
         txf.layer.borderColor = UIColor.separator.cgColor
         txf.layer.borderWidth = 1
         txf.borderStyle = .none
@@ -89,7 +89,7 @@ class SendViewController: UIViewController {
     
     private let btn: UIButton = {
         let btn = UIButton()
-        btn.setTitle("비콘 발신", for: .normal)
+        btn.setTitle("beacon_send".localized, for: .normal)
         btn.setTitleColor(.white, for: .normal)
         btn.backgroundColor = .systemBlue
         btn.layer.cornerRadius = 12
@@ -100,7 +100,7 @@ class SendViewController: UIViewController {
     
     private let stopBtn: UIButton = {
         let btn = UIButton()
-        btn.setTitle("발신 중단", for: .normal)
+        btn.setTitle("beacon_stop".localized, for: .normal)
         btn.setTitleColor(.white, for: .normal)
         btn.backgroundColor = .systemOrange
         btn.layer.cornerRadius = 12
@@ -131,9 +131,9 @@ class SendViewController: UIViewController {
         view.backgroundColor = .systemGroupedBackground
         
         // Build form stacks
-        let uuidGroup = makeFieldGroup(title: "UUID", field: uuidTF)
-        let majorGroup = makeFieldGroup(title: "Major", field: majorTF)
-        let minorGroup = makeFieldGroup(title: "Minor", field: minorTF)
+        let uuidGroup = makeFieldGroup(title: "uuid_label".localized, field: uuidTF)
+        let majorGroup = makeFieldGroup(title: "major_label".localized, field: majorTF)
+        let minorGroup = makeFieldGroup(title: "minor_label".localized, field: minorTF)
 
         // Horizontal button row
         let buttonStack = UIStackView(arrangedSubviews: [btn, stopBtn])
@@ -203,7 +203,7 @@ class SendViewController: UIViewController {
         uuidTF.isEnabled = true
         majorTF.isEnabled = true
         minorTF.isEnabled = true
-        btn.setTitle("비콘 발신", for: .normal)
+        btn.setTitle("beacon_send".localized, for: .normal)
         setButton(stopBtn, enabled: false, enabledColor: .systemOrange)
         validateAndUpdateButtons()
     }
@@ -211,16 +211,16 @@ class SendViewController: UIViewController {
     @objc func startButtonTapped(_ sender: UIButton) {
         let uuidStr = (uuidTF.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
         guard UUID(uuidString: uuidStr) != nil else {
-            showAlert(title: "입력 오류", message: "유효한 UUID 형식이 아닙니다.")
+            showAlert(title: "input_error".localized, message: "invalid_uuid".localized)
             return
         }
         guard let majorVal = UInt16(majorTF.text ?? ""), let minorVal = UInt16(minorTF.text ?? "") else {
-            showAlert(title: "입력 오류", message: "major/minor는 0~65535 범위의 숫자여야 합니다.")
+            showAlert(title: "input_error".localized, message: "major_minor_range_error".localized)
             return
         }
 
         guard let tx = BeaconTransmitter(uuid: uuidStr, major: majorVal, minor: minorVal) else {
-            showAlert(title: "오류", message: "비콘 발신기를 초기화할 수 없습니다.")
+            showAlert(title: "error".localized, message: "tx_init_failed".localized)
             return
         }
         beaconTransmitter = tx
@@ -231,7 +231,7 @@ class SendViewController: UIViewController {
         majorTF.isEnabled = false
         minorTF.isEnabled = false
 
-        btn.setTitle("발신중", for: .normal)
+        btn.setTitle("sending".localized, for: .normal)
         setButton(btn, enabled: false, enabledColor: .systemBlue)
         setButton(stopBtn, enabled: true, enabledColor: .systemOrange)
     }
@@ -244,7 +244,7 @@ class SendViewController: UIViewController {
         majorTF.isEnabled = true
         minorTF.isEnabled = true
 
-        btn.setTitle("비콘 발신", for: .normal)
+        btn.setTitle("beacon_send".localized, for: .normal)
         validateAndUpdateButtons()
         setButton(stopBtn, enabled: false, enabledColor: .systemOrange)
     }
@@ -264,8 +264,8 @@ class SendViewController: UIViewController {
     private func makeUUIDMenu() -> UIMenu {
         let list = UUIDRegistry.load()
         guard !list.isEmpty else {
-            let empty = UIAction(title: "등록된 UUID 없음", attributes: [.disabled]) { _ in }
-            return UIMenu(title: "UUID 선택", children: [empty])
+            let empty = UIAction(title: "uuid_empty".localized, attributes: [.disabled]) { _ in }
+            return UIMenu(title: "uuid_select".localized, children: [empty])
         }
         let actions = list.map { u in
             UIAction(title: u) { [weak self] _ in
@@ -273,7 +273,7 @@ class SendViewController: UIViewController {
                 self?.textFieldsDidChange()
             }
         }
-        return UIMenu(title: "UUID 선택", children: actions)
+        return UIMenu(title: "uuid_select".localized, children: actions)
     }
 
     private func validateAndUpdateButtons() {
@@ -293,7 +293,7 @@ class SendViewController: UIViewController {
         let tb = UIToolbar()
         tb.sizeToFit()
         let flex = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-        let done = UIBarButtonItem(title: "Done", style: .done, target: self, action: #selector(doneTappedOnNumberPad))
+        let done = UIBarButtonItem(title: "done".localized, style: .done, target: self, action: #selector(doneTappedOnNumberPad))
         tb.items = [flex, done]
         return tb
     }
@@ -304,7 +304,7 @@ class SendViewController: UIViewController {
 
     private func showAlert(title: String, message: String) {
         let a = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        a.addAction(UIAlertAction(title: "확인", style: .default))
+        a.addAction(UIAlertAction(title: "ok".localized, style: .default))
         present(a, animated: true)
     }
     
@@ -406,16 +406,16 @@ class BeaconTransmitter: NSObject, CBPeripheralManagerDelegate, CBCentralManager
     
     private func intentAppSettings(content: String) {
         guard let topVC = UIApplication.shared.keyWindow?.rootViewController else { return }
-        let settingsAlert = UIAlertController(title: "권한 설정 알림", message: content, preferredStyle: .alert)
+        let settingsAlert = UIAlertController(title: "permission_title".localized, message: content, preferredStyle: .alert)
         
-        let okAction = UIAlertAction(title: "확인", style: .default) { _ in
+        let okAction = UIAlertAction(title: "ok".localized, style: .default) { _ in
             if let url = URL(string: UIApplication.openSettingsURLString) {
                 UIApplication.shared.open(url, options: [:], completionHandler: nil)
             }
         }
         settingsAlert.addAction(okAction)
         
-        let noAction = UIAlertAction(title: "취소", style: .default)
+        let noAction = UIAlertAction(title: "cancel".localized, style: .default)
         settingsAlert.addAction(noAction)
         
         topVC.present(settingsAlert, animated: true, completion: nil)
@@ -439,7 +439,7 @@ class BeaconTransmitter: NSObject, CBPeripheralManagerDelegate, CBCentralManager
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
         switch central.state {
         case .unauthorized:
-            intentAppSettings(content: "블루투스 사용 권한을 허용해주세요")
+            intentAppSettings(content: "allow_bluetooth_permission".localized)
         case .poweredOn:
             startBeaconSend()
         default:

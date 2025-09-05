@@ -1,0 +1,92 @@
+/*
+  Localizable.strings
+  BeaconAPITest080701
+
+  Created by jh on 9/5/25.
+  
+*/
+/* App */
+"app_name" = "Beacon SendReceiver";
+"landing_title" = "시작하기";
+"landing_subtitle" = "Beacon 기능을 선택하세요";
+
+/* Landing buttons */
+"tx_title" = "비콘 발신기로 등록";
+"tx_subtitle" = "기기에서 iBeacon 신호 발신";
+"rx_title" = "비콘 신호 수신하기";
+"rx_subtitle" = "주변 iBeacon 탐지";
+"reg_title" = "Beacon UUID 등록하기";
+"reg_subtitle" = "탐지 대상 UUID 관리";
+
+/* Empty state / debug */
+"no_beacons_detected" = "감지된 비콘이 없습니다.";
+"no_nearby_beacons" = "주변 비콘이 감지되지 않았습니다.";
+"demo" = "데모";
+"live" = "실시간";
+
+/* Alerts / permissions */
+"permission_title" = "권한 설정 알림";
+"notice" = "알림";
+"ok" = "확인";
+"cancel" = "취소";
+"allow_location_permission" = "위치사용 권한을 허용해주세요";
+"beacon_scan_required" = "비콘스캔 기능 확인이 필요합니다";
+"register_uuid_first_format" = "먼저 UUID를 등록해주세요 (최대 %d개).";
+
+/* Proximity & formatting */
+"proximity_immediate" = "즉시";
+"proximity_near" = "가까움";
+"proximity_far" = "멀리";
+"proximity_unknown" = "미지";
+"rssi_and_proximity_multiline" = "%d dBm\n%@";
+
+/* Detail Sheet */
+"detail_title" = "Beacon 상세 정보";
+"copy_uuid" = "UUID 복사";
+"copy_all" = "전체 복사";
+"uuid_label" = "UUID";
+"major_label" = "Major";
+"minor_label" = "Minor";
+"rssi_label" = "RSSI";
+"proximity_label" = "Proximity";
+"rssi_value_format" = "%d dBm";
+
+/* Common */
+"copied" = "복사되었습니다";
+
+/* Register UUID VC */
+"uuid_register" = "UUID 등록";
+"uuid_add" = "UUID 추가";
+"uuid_edit" = "UUID 편집";
+"enter_uuid" = "UUID를 입력하세요";
+"uuid_placeholder" = "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX";
+"save" = "저장";
+"delete" = "삭제";
+"edit" = "편집";
+"invalid_uuid" = "유효한 UUID 형식이 아닙니다.";
+"uuid_max_format" = "최대 %d개까지 등록할 수 있습니다.";
+"uuid_already_registered" = "이미 등록된 UUID 입니다.";
+
+/* Proximity */
+"proximity_immediate" = "즉시";
+"proximity_near" = "가까움";
+"proximity_far" = "멀리";
+"proximity_unknown" = "미지";
+
+
+/* Send VC */
+"beacon_send" = "비콘 발신";
+"beacon_stop" = "발신 중단";
+"sending" = "발신중";
+"uuid_select" = "UUID 선택";
+"uuid_empty" = "등록된 UUID 없음";
+"major_placeholder" = "Major (0–65535)";
+"minor_placeholder" = "Minor (0–65535)";
+
+/* Alerts (Send VC) */
+"input_error" = "입력 오류";
+"error" = "오류";
+"tx_init_failed" = "비콘 발신기를 초기화할 수 없습니다.";
+"major_minor_range_error" = "major/minor는 0~65535 범위의 숫자여야 합니다.";
+"done" = "완료";
+"allow_bluetooth_permission" = "블루투스 사용 권한을 허용해주세요";

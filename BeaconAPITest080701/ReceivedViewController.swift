@@ -22,7 +22,7 @@ class ReceivedViewController: UIViewController , CLLocationManagerDelegate, CBCe
 
     private let emptyLabel: UILabel = {
         let lb = UILabel()
-        lb.text = "감지된 비콘이 없습니다."
+        lb.text = "no_beacons_detected".localized
         lb.textAlignment = .center
         lb.textColor = .secondaryLabel
         lb.numberOfLines = 0
@@ -80,7 +80,7 @@ class ReceivedViewController: UIViewController , CLLocationManagerDelegate, CBCe
         self.checkLocationPermission()
         NotificationCenter.default.addObserver(self, selector: #selector(uuidListDidChange(_:)), name: .uuidListDidChange, object: nil)
 #if DEBUG
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "데모", style: .plain, target: self, action: #selector(didTapMockData))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "demo".localized, style: .plain, target: self, action: #selector(didTapMockData))
 #endif
     }
     
@@ -121,7 +121,7 @@ class ReceivedViewController: UIViewController , CLLocationManagerDelegate, CBCe
             // [권한 설정 창 이동 실시]
             print("denied")
             //            self.startBeaconScanning()
-            self.intentAppSettings(content: "위치사용 권한을 허용해주세요")
+            self.intentAppSettings(content: "allow_location_permission".localized)
             self.locationManager.requestAlwaysAuthorization()
         }
         if status == .restricted || status == .notDetermined {
@@ -159,7 +159,12 @@ class ReceivedViewController: UIViewController , CLLocationManagerDelegate, CBCe
                 if self.startBeaconScanFlag == false {
                     // 등록된 UUID 불러오기 (없으면 안내)
                     if self.beaconUUIDs.isEmpty {
-                        self.showAlert(tittle: "알림", content: "먼저 UUID를 등록해주세요 (최대 \(UUIDRegistry.limit)개).", okBtb: "확인", noBtn: "")
+                        self.showAlert(
+                            tittle: "notice".localized,
+                            content: String(format: "register_uuid_first_format".localized, UUIDRegistry.limit),
+                            okBtb: "ok".localized,
+                            noBtn: ""
+                        )
                         return
                     }
 
@@ -180,10 +185,20 @@ class ReceivedViewController: UIViewController , CLLocationManagerDelegate, CBCe
                     self.startBeaconScanFlag = true
                 }
             } else {
-                self.showAlert(tittle: "알림", content: "비콘스캔 기능 확인이 필요합니다", okBtb: "확인", noBtn: "")
+                self.showAlert(
+                    tittle: "notice".localized,
+                    content: "beacon_scan_required".localized,
+                    okBtb: "ok".localized,
+                    noBtn: ""
+                )
             }
         } else {
-            self.showAlert(tittle: "알림", content: "비콘스캔 기능 확인이 필요합니다", okBtb: "확인", noBtn: "")
+            self.showAlert(
+                tittle: "notice".localized,
+                content: "beacon_scan_required".localized,
+                okBtb: "ok".localized,
+                noBtn: ""
+            )
         }
     }
     //    private func calculateDistance(rssi: Int, txPower: Int, pathLossExponent: Double = 2.0){
@@ -198,7 +213,7 @@ class ReceivedViewController: UIViewController , CLLocationManagerDelegate, CBCe
             beaconItems.removeAll()
             DispatchQueue.main.async {
                 self.tableView.reloadData()
-                self.updateEmptyState(with: "감지된 비콘이 없습니다")
+                self.updateEmptyState(with: "no_beacons_detected".localized)
             }
             return
         }
@@ -283,9 +298,9 @@ class ReceivedViewController: UIViewController , CLLocationManagerDelegate, CBCe
     // [애플리케이션 설정창 이동 실시 메소드]
     func intentAppSettings(content:String){
         // 앱 설정창 이동 실시
-        let settingsAlert = UIAlertController(title: "권한 설정 알림", message: content, preferredStyle: UIAlertController.Style.alert)
+        let settingsAlert = UIAlertController(title: "permission_title".localized, message: content, preferredStyle: UIAlertController.Style.alert)
         
-        let okAction = UIAlertAction(title: "확인", style: .default) { (action) in
+        let okAction = UIAlertAction(title: "ok".localized, style: .default) { (action) in
             // [확인 버튼 클릭 이벤트 내용 정의 실시]
             if let url = URL(string: UIApplication.openSettingsURLString) {
                 UIApplication.shared.open(url, options: [:], completionHandler: nil)
@@ -293,7 +308,7 @@ class ReceivedViewController: UIViewController , CLLocationManagerDelegate, CBCe
         }
         settingsAlert.addAction(okAction) // 버튼 클릭 이벤트 객체 연결
         
-        let noAction = UIAlertAction(title: "취소", style: .default) { (action) in
+        let noAction = UIAlertAction(title: "cancel".localized, style: .default) { (action) in
             // [취소 버튼 클릭 이벤트 내용 정의 실시]
             return
         }
@@ -334,7 +349,7 @@ class ReceivedViewController: UIViewController , CLLocationManagerDelegate, CBCe
     
     private func updateEmptyState(with message: String?) {
         let isEmpty = beaconItems.isEmpty
-        emptyLabel.text = message ?? "주변 비콘이 감지되지 않았습니다."
+        emptyLabel.text = message ?? "no_nearby_beacons".localized
         emptyLabel.isHidden = !isEmpty
         tableView.isScrollEnabled = !isEmpty
     }
@@ -346,7 +361,7 @@ class ReceivedViewController: UIViewController , CLLocationManagerDelegate, CBCe
             // 데모 모드 시작: 실제 스캔 중지 후 더미 데이터 표시
             if startBeaconScanFlag { stopBeaconScanning() }
             loadMockBeacons()
-            navigationItem.rightBarButtonItem?.title = "실시간"
+            navigationItem.rightBarButtonItem?.title = "live".localized
         } else {
             // 실시간 모드 복귀
             beaconMap.removeAll()
@@ -355,7 +370,7 @@ class ReceivedViewController: UIViewController , CLLocationManagerDelegate, CBCe
             updateEmptyState(with: nil)
             self.loadRegisteredUUIDs()
             self.startBeaconScanning()
-            navigationItem.rightBarButtonItem?.title = "데모"
+            navigationItem.rightBarButtonItem?.title = "demo".localized
         }
     }
 
@@ -496,16 +511,16 @@ final class BeaconCell: UITableViewCell {
     func configure(uuid: String, major: Int, minor: Int, rssi: Int, proximity: CLProximity) {
         titleLabel.text = "\(major)  /  \(minor)"
         subtitleLabel.text = "\(uuid)"
-        rssiLabel.text = "\(rssi) dBm\n\(proximityString(proximity))"
+        rssiLabel.text = String(format: "rssi_and_proximity_multiline".localized, rssi, proximityString(proximity))
     }
 
     private func proximityString(_ p: CLProximity) -> String {
         switch p {
-        case .immediate: return "immediate"
-        case .near: return "near"
-        case .far: return "far"
-        case .unknown: return "unknown"
-        @unknown default: return "unknown"
+        case .immediate: return "proximity_immediate".localized
+        case .near: return "proximity_near".localized
+        case .far: return "proximity_far".localized
+        case .unknown: return "proximity_unknown".localized
+        @unknown default: return "proximity_unknown".localized
         }
     }
 

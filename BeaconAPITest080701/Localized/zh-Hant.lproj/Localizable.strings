@@ -1,0 +1,85 @@
+/* 
+  Localizable.strings
+  BeaconAPITest080701
+
+  Created by jh on 9/5/25.
+  
+*/
+/* App */
+"app_name" = "Beacon SendReceiver";
+"landing_title" = "開始";
+"landing_subtitle" = "請選擇 Beacon 功能";
+
+/* Landing buttons */
+"tx_title" = "註冊為 Beacon 發射器";
+"tx_subtitle" = "從此裝置廣播 iBeacon 訊號";
+"rx_title" = "接收 Beacon 訊號";
+"rx_subtitle" = "偵測附近的 iBeacon";
+"reg_title" = "註冊 Beacon UUID";
+"reg_subtitle" = "管理要偵測的 UUID";
+
+/* Empty state / debug */
+"no_beacons_detected" = "尚未偵測到 Beacon。";
+"no_nearby_beacons" = "附近未發現 Beacon。";
+"demo" = "示範";
+"live" = "即時";
+
+/* Alerts / permissions */
+"permission_title" = "需要權限";
+"notice" = "提示";
+"ok" = "確定";
+"cancel" = "取消";
+"allow_location_permission" = "請允許存取位置資訊。";
+"beacon_scan_required" = "需要啟用 Beacon 掃描功能。";
+"register_uuid_first_format" = "請先註冊 UUID（最多 %d 個）。";
+
+/* Proximity & formatting */
+"proximity_immediate" = "極近";
+"proximity_near" = "近";
+"proximity_far" = "遠";
+"proximity_unknown" = "未知";
+"rssi_and_proximity_multiline" = "%d dBm\n%@";
+
+/* Detail Sheet */
+"detail_title" = "Beacon 詳細資訊";
+"copy_uuid" = "複製 UUID";
+"copy_all" = "全部複製";
+"uuid_label" = "UUID";
+"major_label" = "Major";
+"minor_label" = "Minor";
+"rssi_label" = "RSSI";
+"proximity_label" = "接近度";
+"rssi_value_format" = "%d dBm";
+
+/* Common */
+"copied" = "已複製";
+
+/* Register UUID VC */
+"uuid_register" = "UUID 註冊";
+"uuid_add" = "新增 UUID";
+"uuid_edit" = "編輯 UUID";
+"enter_uuid" = "請輸入 UUID";
+"uuid_placeholder" = "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX";
+"save" = "儲存";
+"delete" = "刪除";
+"edit" = "編輯";
+"invalid_uuid" = "UUID 格式無效。";
+"uuid_max_format" = "最多可註冊 %d 個。";
+"uuid_already_registered" = "此 UUID 已註冊。";
+
+/* Send VC */
+"beacon_send" = "開始發射 Beacon";
+"beacon_stop" = "停止發射";
+"sending" = "發射中";
+"uuid_select" = "選擇 UUID";
+"uuid_empty" = "尚無已註冊的 UUID";
+"major_placeholder" = "Major (0–65535)";
+"minor_placeholder" = "Minor (0–65535)";
+
+/* Alerts (Send VC) */
+"input_error" = "輸入錯誤";
+"error" = "錯誤";
+"tx_init_failed" = "無法初始化發射器。";
+"major_minor_range_error" = "Major/Minor 必須介於 0–65535。";
+"done" = "完成";
+"allow_bluetooth_permission" = "請允許使用藍牙。";

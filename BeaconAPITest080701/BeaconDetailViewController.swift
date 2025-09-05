@@ -29,7 +29,7 @@ class BeaconDetailViewController: UIViewController {
 
     private let titleLabel: UILabel = {
         let lb = UILabel()
-        lb.text = "Beacon 상세 정보"
+        lb.text = "detail_title".localized
         lb.font = .preferredFont(forTextStyle: .headline)
         lb.textColor = .label
         lb.translatesAutoresizingMaskIntoConstraints = false
@@ -58,7 +58,7 @@ class BeaconDetailViewController: UIViewController {
 
     private let copyUUIDButton: UIButton = {
         var cfg = UIButton.Configuration.tinted()
-        cfg.title = "UUID 복사"
+        cfg.title = "copy_uuid".localized
         cfg.image = UIImage(systemName: "doc.on.doc")
         cfg.imagePadding = 6
         cfg.cornerStyle = .medium
@@ -69,7 +69,7 @@ class BeaconDetailViewController: UIViewController {
 
     private let copyAllButton: UIButton = {
         var cfg = UIButton.Configuration.tinted()
-        cfg.title = "전체 복사"
+        cfg.title = "copy_all".localized
         cfg.image = UIImage(systemName: "square.and.arrow.up")
         cfg.imagePadding = 6
         cfg.cornerStyle = .medium
@@ -82,11 +82,11 @@ class BeaconDetailViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
 
-        let uuidRow = makeRow(title: "UUID", value: uuid)
-        let majorRow = makeRow(title: "Major", value: "\(major)")
-        let minorRow = makeRow(title: "Minor", value: "\(minor)")
-        let rssiRow = makeRow(title: "RSSI", value: "\(rssi) dBm")
-        let proxRow = makeRow(title: "Proximity", value: proximityString(proximity))
+        let uuidRow = makeRow(title: "uuid_label".localized, value: uuid)
+        let majorRow = makeRow(title: "major_label".localized, value: "\(major)")
+        let minorRow = makeRow(title: "minor_label".localized, value: "\(minor)")
+        let rssiRow = makeRow(title: "rssi_label".localized, value: String(format: "rssi_value_format".localized, rssi))
+        let proxRow = makeRow(title: "proximity_label".localized, value: proximityString(proximity))
 
         let content = UIStackView(arrangedSubviews: [titleLabel, uuidRow, majorRow, minorRow, rssiRow, proxRow])
         content.axis = .vertical
@@ -124,22 +124,22 @@ class BeaconDetailViewController: UIViewController {
 
     @objc private func copyUUID() {
         UIPasteboard.general.string = uuid
-        showToast("복사되었습니다")
+        showToast("copied".localized)
     }
 
     @objc private func copyAll() {
         let text = "uuid: \(uuid)\nmajor: \(major)\nminor: \(minor)\nrssi: \(rssi)\nproximity: \(proximityString(proximity))"
         UIPasteboard.general.string = text
-        showToast("복사되었습니다")
+        showToast("copied".localized)
     }
 
     private func proximityString(_ p: CLProximity) -> String {
         switch p {
-        case .immediate: return "immediate"
-        case .near: return "near"
-        case .far: return "far"
-        case .unknown: return "unknown"
-        @unknown default: return "unknown"
+        case .immediate: return "proximity_immediate".localized
+        case .near: return "proximity_near".localized
+        case .far: return "proximity_far".localized
+        case .unknown: return "proximity_unknown".localized
+        @unknown default: return "proximity_unknown".localized
         }
     }
 

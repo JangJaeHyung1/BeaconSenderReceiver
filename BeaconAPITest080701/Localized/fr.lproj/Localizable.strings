@@ -1,0 +1,85 @@
+/* 
+  Localizable.strings
+  BeaconAPITest080701
+
+  Created by jh on 9/5/25.
+  
+*/
+/* App */
+"app_name" = "Beacon SendReceiver";
+"landing_title" = "Commencer";
+"landing_subtitle" = "Choisissez une fonction Beacon";
+
+/* Landing buttons */
+"tx_title" = "S'enregistrer comme émetteur Beacon";
+"tx_subtitle" = "Émettre un signal iBeacon depuis cet appareil";
+"rx_title" = "Recevoir des signaux Beacon";
+"rx_subtitle" = "Détecter les iBeacon à proximité";
+"reg_title" = "Enregistrer des UUID Beacon";
+"reg_subtitle" = "Gérer les UUID cibles à détecter";
+
+/* Empty state / debug */
+"no_beacons_detected" = "Aucun beacon détecté.";
+"no_nearby_beacons" = "Aucun beacon à proximité.";
+"demo" = "Démo";
+"live" = "En direct";
+
+/* Alerts / permissions */
+"permission_title" = "Autorisation requise";
+"notice" = "Notification";
+"ok" = "OK";
+"cancel" = "Annuler";
+"allow_location_permission" = "Veuillez autoriser l'accès à la localisation.";
+"beacon_scan_required" = "Fonction de scan Beacon requise.";
+"register_uuid_first_format" = "Veuillez d'abord enregistrer des UUID (jusqu'à %d).";
+
+/* Proximity & formatting */
+"proximity_immediate" = "Immédiat";
+"proximity_near" = "Proche";
+"proximity_far" = "Lointain";
+"proximity_unknown" = "Inconnu";
+"rssi_and_proximity_multiline" = "%d dBm\n%@";
+
+/* Detail Sheet */
+"detail_title" = "Détails du Beacon";
+"copy_uuid" = "Copier l'UUID";
+"copy_all" = "Tout copier";
+"uuid_label" = "UUID";
+"major_label" = "Major";
+"minor_label" = "Minor";
+"rssi_label" = "RSSI";
+"proximity_label" = "Proximité";
+"rssi_value_format" = "%d dBm";
+
+/* Common */
+"copied" = "Copié";
+
+/* Register UUID VC */
+"uuid_register" = "Enregistrer un UUID";
+"uuid_add" = "Ajouter un UUID";
+"uuid_edit" = "Modifier l'UUID";
+"enter_uuid" = "Saisissez un UUID";
+"uuid_placeholder" = "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX";
+"save" = "Enregistrer";
+"delete" = "Supprimer";
+"edit" = "Modifier";
+"invalid_uuid" = "Format d'UUID invalide.";
+"uuid_max_format" = "Vous pouvez enregistrer jusqu'à %d éléments.";
+"uuid_already_registered" = "Cet UUID est déjà enregistré.";
+
+/* Send VC */
+"beacon_send" = "Démarrer l'émission";
+"beacon_stop" = "Arrêter l'émission";
+"sending" = "Émission...";
+"uuid_select" = "Sélectionner un UUID";
+"uuid_empty" = "Aucun UUID enregistré";
+"major_placeholder" = "Major (0–65535)";
+"minor_placeholder" = "Minor (0–65535)";
+
+/* Alerts (Send VC) */
+"input_error" = "Erreur de saisie";
+"error" = "Erreur";
+"tx_init_failed" = "Échec de l'initialisation de l'émetteur.";
+"major_minor_range_error" = "Major/Minor doit être compris entre 0 et 65535.";
+"done" = "Terminé";
+"allow_bluetooth_permission" = "Veuillez autoriser l'accès au Bluetooth.";

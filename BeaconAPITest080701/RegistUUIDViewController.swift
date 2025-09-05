@@ -63,7 +63,7 @@ final class RegistUUIDViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "UUID 등록"
+        title = "uuid_register".localized
         view.backgroundColor = .systemBackground
 
         navigationItem.rightBarButtonItems = [
@@ -91,18 +91,18 @@ final class RegistUUIDViewController: UIViewController {
     }
 
     @objc private func addTapped() {
-        presentEditor(title: "UUID 추가", initial: nil) { [weak self] newValue in
+        presentEditor(title: "uuid_add".localized, initial: nil) { [weak self] newValue in
             guard let self else { return }
             if self.uuidStrings.count >= UUIDRegistry.limit {
-                self.simpleAlert("최대 \(UUIDRegistry.limit)개까지 등록할 수 있습니다.")
+                self.simpleAlert(String(format: "uuid_max_format".localized, UUIDRegistry.limit))
                 return
             }
             guard self.isValidUUIDString(newValue) else {
-                self.simpleAlert("유효한 UUID 형식이 아닙니다.")
+                self.simpleAlert("invalid_uuid".localized)
                 return
             }
             if self.uuidStrings.contains(where: { $0.caseInsensitiveCompare(newValue) == .orderedSame }) {
-                self.simpleAlert("이미 등록된 UUID 입니다.")
+                self.simpleAlert("uuid_already_registered".localized)
                 return
             }
             self.uuidStrings.append(newValue.uppercased())
@@ -112,14 +112,14 @@ final class RegistUUIDViewController: UIViewController {
     }
 
     private func presentEditor(title: String, initial: String?, onSave: @escaping (String) -> Void) {
-        let alert = UIAlertController(title: title, message: "UUID를 입력하세요", preferredStyle: .alert)
+        let alert = UIAlertController(title: title, message: "enter_uuid".localized, preferredStyle: .alert)
         alert.addTextField { tf in
-            tf.placeholder = "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+            tf.placeholder = "uuid_placeholder".localized
             tf.autocapitalizationType = .allCharacters
             tf.text = initial
         }
-        alert.addAction(UIAlertAction(title: "취소", style: .cancel))
-        alert.addAction(UIAlertAction(title: "저장", style: .default, handler: { _ in
+        alert.addAction(UIAlertAction(title: "cancel".localized, style: .cancel))
+        alert.addAction(UIAlertAction(title: "save".localized, style: .default, handler: { _ in
             let value = alert.textFields?.first?.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
             onSave(value)
         }))
@@ -131,8 +131,8 @@ final class RegistUUIDViewController: UIViewController {
     }
 
     private func simpleAlert(_ message: String) {
-        let a = UIAlertController(title: "알림", message: message, preferredStyle: .alert)
-        a.addAction(UIAlertAction(title: "확인", style: .default))
+        let a = UIAlertController(title: "notice".localized, message: message, preferredStyle: .alert)
+        a.addAction(UIAlertAction(title: "ok".localized, style: .default))
         present(a, animated: true)
     }
 }
@@ -161,19 +161,19 @@ extension RegistUUIDViewController: UITableViewDataSource, UITableViewDelegate {
 
     // 스와이프 액션: 편집
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        let edit = UIContextualAction(style: .normal, title: "편집") { [weak self] _, _, done in
+        let edit = UIContextualAction(style: .normal, title: "edit".localized) { [weak self] _, _, done in
             guard let self else { return }
             let current = self.uuidStrings[indexPath.row]
-            self.presentEditor(title: "UUID 편집", initial: current) { newValue in
+            self.presentEditor(title: "uuid_edit".localized, initial: current) { newValue in
                 guard self.isValidUUIDString(newValue) else {
-                    self.simpleAlert("유효한 UUID 형식이 아닙니다.")
+                    self.simpleAlert("invalid_uuid".localized)
                     return
                 }
                 // 중복 체크 (자기 자신 제외)
                 if self.uuidStrings.enumerated().contains(where: { idx, s in
                     idx != indexPath.row && s.caseInsensitiveCompare(newValue) == .orderedSame
                 }) {
-                    self.simpleAlert("이미 등록된 UUID 입니다.")
+                    self.simpleAlert("uuid_already_registered".localized)
                     return
                 }
                 self.uuidStrings[indexPath.row] = newValue.uppercased()
@@ -182,7 +182,7 @@ extension RegistUUIDViewController: UITableViewDataSource, UITableViewDelegate {
             }
             done(true)
         }
-        let delete = UIContextualAction(style: .destructive, title: "삭제") { [weak self] _, _, done in
+        let delete = UIContextualAction(style: .destructive, title: "delete".localized) { [weak self] _, _, done in
             guard let self else { return }
             self.uuidStrings.remove(at: indexPath.row)
             UUIDRegistry.save(self.uuidStrings)
@@ -197,11 +197,10 @@ extension RegistUUIDViewController: UITableViewDataSource, UITableViewDelegate {
         tableView.deselectRow(at: indexPath, animated: true)
 
         // 짧게 표시되는 알림
-        let alert = UIAlertController(title: nil, message: "복사되었습니다", preferredStyle: .alert)
+        let alert = UIAlertController(title: nil, message: "copied".localized, preferredStyle: .alert)
         present(alert, animated: true)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
             alert.dismiss(animated: true)
         }
     }
 }
-

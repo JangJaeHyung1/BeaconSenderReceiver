@@ -1,0 +1,85 @@
+/* 
+  Localizable.strings
+  BeaconAPITest080701
+
+  Created by jh on 9/5/25.
+  
+*/
+/* App */
+"app_name" = "Beacon SendReceiver";
+"landing_title" = "Get Started";
+"landing_subtitle" = "Choose a Beacon feature";
+
+/* Landing buttons */
+"tx_title" = "Register as Beacon Transmitter";
+"tx_subtitle" = "Broadcast iBeacon signal from this device";
+"rx_title" = "Receive Beacon signals";
+"rx_subtitle" = "Detect nearby iBeacons";
+"reg_title" = "Register Beacon UUIDs";
+"reg_subtitle" = "Manage target UUIDs for detection";
+
+/* Empty state / debug */
+"no_beacons_detected" = "No beacons detected.";
+"no_nearby_beacons" = "No nearby beacons found.";
+"demo" = "Demo";
+"live" = "Live";
+
+/* Alerts / permissions */
+"permission_title" = "Permission Required";
+"notice" = "Notice";
+"ok" = "OK";
+"cancel" = "Cancel";
+"allow_location_permission" = "Please allow location access.";
+"beacon_scan_required" = "Beacon scanning capability required.";
+"register_uuid_first_format" = "Please register UUIDs first (up to %d).";
+
+/* Proximity & formatting */
+"proximity_immediate" = "Immediate";
+"proximity_near" = "Near";
+"proximity_far" = "Far";
+"proximity_unknown" = "Unknown";
+"rssi_and_proximity_multiline" = "%d dBm\n%@";
+
+/* Detail Sheet */
+"detail_title" = "Beacon Details";
+"copy_uuid" = "Copy UUID";
+"copy_all" = "Copy All";
+"uuid_label" = "UUID";
+"major_label" = "Major";
+"minor_label" = "Minor";
+"rssi_label" = "RSSI";
+"proximity_label" = "Proximity";
+"rssi_value_format" = "%d dBm";
+
+/* Common */
+"copied" = "Copied";
+
+/* Register UUID VC */
+"uuid_register" = "Register UUID";
+"uuid_add" = "Add UUID";
+"uuid_edit" = "Edit UUID";
+"enter_uuid" = "Enter a UUID";
+"uuid_placeholder" = "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX";
+"save" = "Save";
+"delete" = "Delete";
+"edit" = "Edit";
+"invalid_uuid" = "Invalid UUID format.";
+"uuid_max_format" = "You can register up to %d items.";
+"uuid_already_registered" = "This UUID is already registered.";
+
+/* Send VC */
+"beacon_send" = "Start Beacon";
+"beacon_stop" = "Stop Transmitting";
+"sending" = "Transmitting";
+"uuid_select" = "Select UUID";
+"uuid_empty" = "No UUIDs registered";
+"major_placeholder" = "Major (0–65535)";
+"minor_placeholder" = "Minor (0–65535)";
+
+/* Alerts (Send VC) */
+"input_error" = "Input Error";
+"error" = "Error";
+"tx_init_failed" = "Failed to initialize transmitter.";
+"major_minor_range_error" = "Major/Minor must be 0–65535.";
+"done" = "Done";
+"allow_bluetooth_permission" = "Please allow Bluetooth access.";

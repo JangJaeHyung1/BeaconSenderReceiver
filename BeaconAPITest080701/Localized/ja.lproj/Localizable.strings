@@ -1,0 +1,85 @@
+/* 
+  Localizable.strings
+  BeaconAPITest080701
+
+  Created by jh on 9/5/25.
+  
+*/
+/* App */
+"app_name" = "Beacon SendReceiver";
+"landing_title" = "はじめる";
+"landing_subtitle" = "Beacon 機能を選択してください";
+
+/* Landing buttons */
+"tx_title" = "ビーコン送信機として登録";
+"tx_subtitle" = "このデバイスから iBeacon 信号を発信";
+"rx_title" = "ビーコン信号を受信";
+"rx_subtitle" = "周辺の iBeacon を検出";
+"reg_title" = "Beacon の UUID を登録";
+"reg_subtitle" = "検出対象の UUID を管理";
+
+/* Empty state / debug */
+"no_beacons_detected" = "ビーコンが検出されませんでした。";
+"no_nearby_beacons" = "近くにビーコンは見つかりませんでした。";
+"demo" = "デモ";
+"live" = "ライブ";
+
+/* Alerts / permissions */
+"permission_title" = "権限が必要です";
+"notice" = "お知らせ";
+"ok" = "OK";
+"cancel" = "キャンセル";
+"allow_location_permission" = "位置情報へのアクセスを許可してください。";
+"beacon_scan_required" = "ビーコンのスキャン機能が必要です。";
+"register_uuid_first_format" = "まず UUID を登録してください（最大 %d 件）。";
+
+/* Proximity & formatting */
+"proximity_immediate" = "至近";
+"proximity_near" = "近距離";
+"proximity_far" = "遠距離";
+"proximity_unknown" = "不明";
+"rssi_and_proximity_multiline" = "%d dBm\n%@";
+
+/* Detail Sheet */
+"detail_title" = "Beacon の詳細";
+"copy_uuid" = "UUID をコピー";
+"copy_all" = "すべてコピー";
+"uuid_label" = "UUID";
+"major_label" = "Major";
+"minor_label" = "Minor";
+"rssi_label" = "RSSI";
+"proximity_label" = "近接度";
+"rssi_value_format" = "%d dBm";
+
+/* Common */
+"copied" = "コピーしました";
+
+/* Register UUID VC */
+"uuid_register" = "UUID を登録";
+"uuid_add" = "UUID を追加";
+"uuid_edit" = "UUID を編集";
+"enter_uuid" = "UUID を入力してください";
+"uuid_placeholder" = "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX";
+"save" = "保存";
+"delete" = "削除";
+"edit" = "編集";
+"invalid_uuid" = "UUID の形式が正しくありません。";
+"uuid_max_format" = "最大 %d 件まで登録できます。";
+"uuid_already_registered" = "この UUID は既に登録されています。";
+
+/* Send VC */
+"beacon_send" = "Beacon を送信開始";
+"beacon_stop" = "送信停止";
+"sending" = "送信中";
+"uuid_select" = "UUID を選択";
+"uuid_empty" = "登録された UUID はありません";
+"major_placeholder" = "Major (0–65535)";
+"minor_placeholder" = "Minor (0–65535)";
+
+/* Alerts (Send VC) */
+"input_error" = "入力エラー";
+"error" = "エラー";
+"tx_init_failed" = "送信機の初期化に失敗しました。";
+"major_minor_range_error" = "Major/Minor は 0–65535 の範囲で指定してください。";
+"done" = "完了";
+"allow_bluetooth_permission" = "Bluetooth へのアクセスを許可してください。";
